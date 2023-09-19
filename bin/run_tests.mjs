@@ -15,7 +15,6 @@ import { k6_run } from "./lib/k6.mjs"
 // Parameters
 const ROLE_COUNT = 10
 const USER_COUNT = 5
-const PROJECT_COUNT = 20
 
 // Refresh k6 files on the tester cluster
 const clusters = runCollectingJSONOutput(`terraform -chdir=${terraformDir()} output -json`)["clusters"]["value"]
@@ -36,12 +35,6 @@ k6_run(tester,
   { BASE_URL: rancherClusterNetworkURL, USERNAME: "admin", PASSWORD: ADMIN_PASSWORD, ROLE_COUNT: ROLE_COUNT, USER_COUNT: USER_COUNT },
   { commit: commit, cluster: "upstream", test: "create_roles_users.mjs", Roles: ROLE_COUNT, Users: USER_COUNT },
   "k6/create_roles_users.js", true
-)
-// create projects
-k6_run(tester,
-  { BASE_URL: rancherClusterNetworkURL, USERNAME: "admin", PASSWORD: ADMIN_PASSWORD, PROJECT_COUNT: PROJECT_COUNT },
-  { commit: commit, cluster: "upstream", test: "create_projects.mjs", Projects: PROJECT_COUNT },
-  "k6/create_projects.js", true
 )
 
 // Output access details
