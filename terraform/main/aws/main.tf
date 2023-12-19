@@ -28,7 +28,7 @@ locals {
 
 provider "aws" {
   region  = local.region
-  profile = "rancher-eng"
+  profile = var.aws_credentials_profile
 }
 
 module "network" {
@@ -39,7 +39,7 @@ module "network" {
   ssh_public_key_path  = var.ssh_public_key_path
   ssh_private_key_path = var.ssh_private_key_path
   iam_instance_profile = var.iam_instance_profile
-  bastion_host_ami     = "ami-0b1e35bb86d836c49"
+  bastion_host_ami     = var.arm_64_ami
 }
 
 
