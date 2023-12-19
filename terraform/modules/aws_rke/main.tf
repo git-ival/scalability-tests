@@ -3,6 +3,7 @@ module "server_nodes" {
   source                = "../aws_host"
   ami                   = var.ami
   instance_type         = var.instance_type
+  iam_instance_profile  = var.iam_instance_profile
   availability_zone     = var.availability_zone
   project_name          = var.project_name
   name                  = "${var.name}-server-${count.index}"
@@ -24,6 +25,7 @@ module "agent_nodes" {
   source                      = "../aws_host"
   ami                         = var.ami
   instance_type               = var.instance_type
+  iam_instance_profile        = var.iam_instance_profile
   availability_zone           = var.availability_zone
   project_name                = var.project_name
   name                        = "${var.name}-agent-${count.index}"

@@ -24,6 +24,11 @@ variable "instance_type" {
   default     = "t4g.small"
 }
 
+variable "iam_instance_profile" {
+  description = "IAM profile to use for the EC2 instance"
+  default     = null
+}
+
 variable "ssh_key_name" {
   description = "Name of the SSH key used to access the instance"
   type        = string

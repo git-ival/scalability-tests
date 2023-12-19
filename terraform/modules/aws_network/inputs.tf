@@ -39,3 +39,8 @@ variable "bastion_host_instance_type" {
   description = "EC2 instance type"
   default     = "t4g.small"
 }
+
+variable "iam_instance_profile" {
+  description = "IAM profile to use for the EC2 instance"
+  default     = null
+}

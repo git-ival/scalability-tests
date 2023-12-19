@@ -29,7 +29,7 @@ resource "aws_db_parameter_group" "db_parameter_group_postgres" {
 }
 
 resource "aws_db_instance" "instance" {
-  depends_on        = [
+  depends_on = [
     aws_db_parameter_group.db_parameter_group_mariadb, aws_db_parameter_group.db_parameter_group_postgres
   ]
   identifier        = "${var.project_name}-${var.name}"
@@ -38,7 +38,7 @@ resource "aws_db_instance" "instance" {
 
   allocated_storage      = var.allocated_storage_gb
   iops                   = var.iops
-  db_name                = var.name
+  name                   = var.name
   engine                 = var.datastore
   engine_version         = var.datastore == "mariadb" ? "10.6" : (var.datastore == "postgres" ? "14.5" : null)
   username               = var.username

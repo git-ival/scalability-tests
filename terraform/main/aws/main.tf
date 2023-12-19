@@ -1,5 +1,5 @@
 terraform {
-  required_version = "1.5.6"
+  required_version = ">= 1.5.0, <=1.5.7"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -27,7 +27,8 @@ locals {
 }
 
 provider "aws" {
-  region = local.region
+  region  = local.region
+  profile = "rancher-eng"
 }
 
 module "network" {
@@ -37,6 +38,8 @@ module "network" {
   availability_zone    = local.availability_zone
   ssh_public_key_path  = var.ssh_public_key_path
   ssh_private_key_path = var.ssh_private_key_path
+  iam_instance_profile = var.iam_instance_profile
+  bastion_host_ami     = "ami-0b1e35bb86d836c49"
 }
 
 
@@ -61,6 +64,7 @@ module "k3s_cluster" {
   tunnel_app_https_port     = local.first_tunnel_app_https_port + count.index
   ami                       = local.k3s_clusters[count.index].ami
   instance_type             = local.k3s_clusters[count.index].instance_type
+  iam_instance_profile      = var.iam_instance_profile
   availability_zone         = local.availability_zone
   ssh_key_name              = module.network.key_name
   ssh_private_key_path      = var.ssh_private_key_path
@@ -90,6 +94,7 @@ module "rke_cluster" {
   tunnel_app_https_port     = local.first_tunnel_app_https_port + length(local.k3s_clusters) + count.index
   ami                       = local.rke_clusters[count.index].ami
   instance_type             = local.rke_clusters[count.index].instance_type
+  iam_instance_profile      = var.iam_instance_profile
   availability_zone         = local.availability_zone
   ssh_key_name              = module.network.key_name
   ssh_private_key_path      = var.ssh_private_key_path
@@ -119,6 +124,7 @@ module "rke2_cluster" {
   tunnel_app_https_port     = local.first_tunnel_app_https_port + length(local.k3s_clusters) + length(local.rke_clusters) + count.index
   ami                       = local.rke2_clusters[count.index].ami
   instance_type             = local.rke2_clusters[count.index].instance_type
+  iam_instance_profile      = var.iam_instance_profile
   availability_zone         = local.availability_zone
   ssh_key_name              = module.network.key_name
   ssh_private_key_path      = var.ssh_private_key_path
