@@ -4,7 +4,7 @@ locals {
     name                        = "upstream"
     server_count                = 1
     agent_count                 = 0
-    distro_version              = "v1.27.7+k3s2"
+    distro_version              = "v1.26.9+k3s1"
     reserve_node_for_monitoring = true
 
     // aws-specific
@@ -19,7 +19,7 @@ locals {
       name                        = "downstream-${i}"
       server_count                = 1
       agent_count                 = 0
-      distro_version              = "v1.27.7+k3s2"
+      distro_version              = "v1.26.9+k3s1"
       reserve_node_for_monitoring = false
 
       // aws-specific

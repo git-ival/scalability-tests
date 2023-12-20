@@ -7,6 +7,7 @@ import {
   q,
   runCollectingJSONOutput,
   runCollectingOutput,
+  getAppAddressesFor,
 } from "./lib/common.mjs"
 import { k6_run } from "./lib/k6.mjs"
 
@@ -23,6 +24,16 @@ helm_install("k6-files", dir("charts/k6-files"), upstream, "tester", {})
 // Create config maps
 const commit = runCollectingOutput("git rev-parse --short HEAD").trim()
 const downstreams = Object.entries(clusters).filter(([k, v]) => k.startsWith("downstream"))
+
+// create users and roles
+const upstreamAddresses = getAppAddressesFor(upstream)
+const rancherURL = upstreamAddresses.localNetwork.httpsURL
+const rancherClusterNetworkURL = upstreamAddresses.clusterNetwork.httpsURL
+k6_run(upstream,
+  { BASE_URL: rancherClusterNetworkURL, USERNAME: "admin", PASSWORD: ADMIN_PASSWORD, ROLE_COUNT: ROLE_COUNT, USER_COUNT: USER_COUNT },
+  { commit: commit, cluster: "upstream", test: "create_roles_users.mjs", Roles: ROLE_COUNT, Users: USER_COUNT },
+  "k6/create_roles_users.js", true
+)
 
 // Output access details
 console.log("*** ACCESS DETAILS")

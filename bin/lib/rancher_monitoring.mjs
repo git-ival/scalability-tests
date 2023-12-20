@@ -1,7 +1,7 @@
 import { helm_install } from "./common.mjs";
 
-const RANCHER_MONITORING_BRANCH = "release-v2.8"
-const RANCHER_MONITORING_VERSION = "103.0.0+up45.31.1"
+const RANCHER_MONITORING_BRANCH = "release-v2.7"
+const RANCHER_MONITORING_VERSION = "102.0.2+up40.1.2"
 const RANCHER_MONITORING_CHART = `https://github.com/rancher/charts/raw/${RANCHER_MONITORING_BRANCH}/assets/rancher-monitoring/rancher-monitoring-${RANCHER_MONITORING_VERSION}.tgz`
 const RANCHER_MONITORING_CRD_CHART = `https://github.com/rancher/charts/raw/${RANCHER_MONITORING_BRANCH}/assets/rancher-monitoring-crd/rancher-monitoring-crd-${RANCHER_MONITORING_VERSION}.tgz`
 

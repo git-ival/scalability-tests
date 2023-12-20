@@ -17,7 +17,7 @@ import { k6_run } from "./lib/k6.mjs";
 import { install_rancher_monitoring } from "./lib/rancher_monitoring.mjs";
 
 // Parameters
-const RANCHER_VERSION = "2.8.0"
+const RANCHER_VERSION = "2.7.6"
 const RANCHER_CHART = `https://releases.rancher.com/server-charts/latest/rancher-${RANCHER_VERSION}.tgz`
 const RANCHER_IMAGE_TAG = `v${RANCHER_VERSION}`
 const CERT_MANAGER_CHART = "https://charts.jetstack.io/charts/cert-manager-v1.11.1.tgz"
@@ -67,7 +67,16 @@ helm_install("rancher-ingress", dir("charts/rancher-ingress"), upstream, "defaul
   ingressClassName: upstream["ingress_class_name"],
 })
 
-install_rancher_monitoring(upstream, {})
+const monitoringRestrictions = {}
+
+if (upstream["node_access_commands"].length > 1) {
+  monitoringRestrictions = {
+    nodeSelector: { monitoring: "true" },
+    tolerations: [{ key: "monitoring", operator: "Exists", effect: "NoSchedule" }],
+  }
+}
+
+install_rancher_monitoring(upstream, monitoringRestrictions)
 
 helm_install("cgroups-exporter", dir("charts/cgroups-exporter"), upstream, "cattle-monitoring-system", {})
 
