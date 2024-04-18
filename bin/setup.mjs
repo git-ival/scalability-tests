@@ -19,7 +19,7 @@ import { install_rancher_monitoring } from "./lib/rancher_monitoring.mjs";
 // Parameters
 const RANCHER_VERSION = "2.7.6"
 const RANCHER_CHART = `https://releases.rancher.com/server-charts/latest/rancher-${RANCHER_VERSION}.tgz`
-const RANCHER_IMAGE_TAG = `v${RANCHER_VERSION}`
+const RANCHER_IMAGE_TAG = `v2.7.6-debug-43051-1`
 const CERT_MANAGER_CHART = "https://charts.jetstack.io/charts/cert-manager-v1.11.1.tgz"
 const GRAFANA_CHART = "https://github.com/grafana/helm-charts/releases/download/grafana-6.56.5/grafana-6.56.5.tgz"
 
