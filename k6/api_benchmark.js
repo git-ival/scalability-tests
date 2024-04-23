@@ -11,7 +11,7 @@ const token = __ENV.TOKEN
 const cluster = __ENV.CLUSTER || "local"
 const resource = __ENV.RESOURCE || "management.cattle.io.setting"
 const api = __ENV.API || "steve"
-const paginationStyle = __ENV.PAGINATION_STYLE || "k8s"
+const paginationStyle = __ENV.PAGINATION_STYLE || "steve"
 const pageSize = __ENV.PAGE_SIZE || 100
 const urlSuffix = __ENV.URL_SUFFIX || ""
 
