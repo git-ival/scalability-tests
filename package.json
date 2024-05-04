@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "har-to-k6": "^0.14.8"
+  },
+  "devDependencies": {
+    "@types/k6": "^0.50.1"
+  }
+}
