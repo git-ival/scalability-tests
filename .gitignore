@@ -11,3 +11,4 @@ bin/out.json
 bin/results.csv
 bin/scli
 node_modules
+.env
