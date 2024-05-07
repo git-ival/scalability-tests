@@ -7,7 +7,8 @@ import { getCookies, login } from "./rancher_utils.js";
 import * as k8s from './k8s.js'
 
 const configMapCount = __ENV.CONFIG_MAP_COUNT
-const vus = 1
+const vus = __ENV.K6_VUS || 20
+const rate = 5
 const configMapData = open('./964KB.txt')
 const nameScheme = __ENV.NAME_SCHEME
 const namespace = "vai-test"
@@ -29,7 +30,7 @@ export const options = {
   setupTimeout: '8h',
   scenarios: {
     createConfigMaps: {
-      executor: 'per-vu-iterations',
+      executor: 'shared-iterations',
       exec: 'createConfigMaps',
       vus: vus,
       iterations: configMapCount,
@@ -106,19 +107,13 @@ export function createConfigMaps(cookies) {
   let response = http.post(
     `${baseUrl}/v1/configmaps`,
     JSON.stringify(body),
-    {
-      headers: {
-        accept: 'application/json',
-        'content-type': 'application/yaml',
-        referer: `${baseUrl}/dashboard/c/local/explorer/configmap/create`,
-      },
-      cookies: cookies,
-    }
+    { cookies: cookies }
   )
 
   check(response, {
     '/v1/configmaps returns status 201': (r) => r.status === 201,
   })
+  sleep(1.0 / rate)
 }
 
 // function teardown(cookies) {

@@ -6,7 +6,7 @@ import * as k8s from './k8s.js'
 // Parameters
 const namespace = "scalability-test-temp"
 const data = encoding.b64encode("a".repeat(1))
-const vus = 5
+const vus = __ENV.K6_VUS || 5
 const duration = '2h'
 const rate = 1
 const nameScheme = __ENV.NAME_SCHEME
