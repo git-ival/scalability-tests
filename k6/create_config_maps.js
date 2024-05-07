@@ -9,6 +9,7 @@ import * as k8s from './k8s.js'
 const configMapCount = __ENV.CONFIG_MAP_COUNT
 const vus = 1
 const configMapData = open('./964KB.txt')
+const nameScheme = __ENV.NAME_SCHEME
 const namespace = "vai-test"
 
 const kubeconfig = k8s.kubeconfig(__ENV.KUBECONFIG, __ENV.CONTEXT)
@@ -32,12 +33,16 @@ export const options = {
       exec: 'createConfigMaps',
       vus: vus,
       iterations: configMapCount,
-      maxDuration: '1h',
+      maxDuration: `${configMapCount}s`,
     }
   },
   thresholds: {
-    checks: ['rate>0.99']
-  }
+    checks: ['rate>0.99'], // the rate of successful checks should be higher than 99%
+    http_req_failed: ['rate<=0.01'], // http errors should be less than 1%
+    http_req_duration: ['p(99)<=500'], // 95% of requests should be below 500ms
+  },
+  teardownTimeout: '5m',
+  summaryTrendStats: ['avg', 'min', 'med', 'max', 'p(95)', 'p(99)', 'count'],
 }
 
 function createNamespace() {
@@ -63,7 +68,6 @@ function cleanup(cookies) {
   })
   JSON.parse(res.body)["data"].filter(r => r["metadata"]["name"].startsWith("test-")).forEach(r => {
     res = http.del(`${baseUrl}/v1/configmaps/${r["id"]}`, { cookies: cookies })
-    // console.log("CONFIGMAP DELETE: \n", res)
     check(res, {
       'DELETE /v1/configmaps returns status 204': (r) => r.status === 204,
     })
@@ -80,26 +84,20 @@ export function setup() {
   // delete leftovers, if any
   cleanup(cookies)
 
-  let data = {
-    cookies: cookies,
-    principalIds: getPrincipalIds(cookies),
-    myId: getMyId(cookies),
-    clusterIds: getClusterIds(cookies)
-  }
-
   createNamespace()
   // return data that remains constant throughout the test
-  return data
+  return cookies
 }
 
-export function createConfigMaps(data) {
-  const i = exec.scenario.iterationInTest
-  const configMapName = `test-config-maps-${i}`
+export function createConfigMaps(cookies) {
+  // const i = exec.scenario.iterationInTest
+  const namePrefix = `${nameScheme}` || `test-config-map-${exec.scenario.name}`
+  const name = `${namePrefix}-${exec.scenario.iterationInTest}`.toLowerCase()
   const body = {
     "apiVersion": "v1",
     "kind": "ConfigMap",
     "metadata": {
-      "name": configMapName,
+      "name": name,
       "namespace": namespace
     },
     "data": { "964KB.txt": configMapData }
@@ -112,31 +110,28 @@ export function createConfigMaps(data) {
       headers: {
         accept: 'application/json',
         'content-type': 'application/yaml',
-        referer:
-          `${baseUrl}/dashboard/c/local/explorer/configmap/create`,
+        referer: `${baseUrl}/dashboard/c/local/explorer/configmap/create`,
       },
-      cookies: data.cookies
+      cookies: cookies,
     }
   )
-  // console.log(response.request)
-  // console.log("\n\nRESPONSE:\n")
-  // console.log(response)
+
   check(response, {
     '/v1/configmaps returns status 201': (r) => r.status === 201,
   })
 }
 
-// function deleteConfigMap() {
+// function teardown(cookies) {
 //   response = http.del(
-//     `${baseUrl}/v1/configmaps/default/${configMapName}`,
+//     `${baseUrl}/v1/configmaps/default/${name}`,
 //     null,
 //     {
 //       headers: {
 //         accept: 'application/json',
 //         referer:
-//           `${baseUrl}/dashboard/c/local/explorer/configmap?q=${configMapName}`,
+//           `${baseUrl}/dashboard/c/local/explorer/configmap?q=${name}`,
 //       },
-//       cookies: cookies
+//       cookies: cookies,
 //     }
 //   )
 // }
