@@ -18,13 +18,6 @@ export const headerDataRecv = new Trend('header_data_recv');
 
 // Option setting
 export const options = {
-  // insecureSkipTLSVerify: true,
-  // tlsAuth: [
-  //   {
-  //     cert: kubeconfig["cert"],
-  //     key: kubeconfig["key"],
-  //   },
-  // ],
   setupTimeout: '8h',
   scenarios: {
     load: {
@@ -54,7 +47,6 @@ export function setup() {
 
   let { _, crdArray } = crdUtil.getCRDsMatchingName(baseUrl, cookies, namePrefix)
 
-  // sleep(300)
   // return data that remains constant throughout the test
   return { cookies: cookies, crdArray: checkAndBuildCRDArray(cookies, crdArray) }
 }
@@ -79,7 +71,6 @@ export function checkAndBuildCRDArray(cookies, crdArray) {
       crdUtil.trackDataMetricsPerURL(res, crdUtil.crdsTag, headerDataRecv, epDataRecv)
       sleep(0.25)
     }
-    // let res = null
     let { res, crdArray } = crdUtil.getCRDsMatchingName(baseUrl, cookies, namePrefix)
     if (res.status != 200 && attempts == (retries - 1)) fail("Failed to retrieve expected CRDs during setup")
     attempts += 1

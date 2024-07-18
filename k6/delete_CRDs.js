@@ -48,7 +48,6 @@ function cleanup(cookies) {
   crdArray.forEach(r => {
     let delRes = crdUtil.deleteCRD(baseUrl, cookies, r["id"])
     if (delRes.status !== 200 && delRes.status !== 204) deleteAllFailed = true
-    // console.log("Delete status: ", delRes.status)
     sleep(0.15)
   })
   return deleteAllFailed
@@ -66,7 +65,6 @@ export function setup() {
   if (deleteAllFailed) fail("Failed to delete all existing crontab CRDs during setup!")
   let { _, crdArray } = crdUtil.getCRDsMatchingName(baseUrl, cookies, namePrefix)
 
-  // sleep(300)
   // return data that remains constant throughout the test
   return { cookies: cookies, crdArray: checkAndBuildCRDArray(cookies, crdArray) }
 }
@@ -110,6 +108,4 @@ export function deleteCRDs(data) {
   })
   let { _, timeSpent } = crdUtil.verifyCRDs(baseUrl, data.cookies, namePrefix, 0, crdUtil.crdRefreshDelayMs * 5)
   timePolled.add(timeSpent, crdUtil.crdsTag)
-  // Give time for resource usage to cool down between iterations
-  // sleep(900)
 }

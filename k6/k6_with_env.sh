@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-env_file=${1:-"./.env"}
-test_file=${2}
-iters=${3:-1}
-delay=${4:-15} # in minutes
-address=${5:-"localhost:6565"}
+env_file=${1:-"./.env"} # path to the source-able .env file containing relevant variables
+test_file=${2} # path to the k6 test file to run
+iters=${3:-1} # the number of iterations of the test to loop through
+delay=${4:-15} # the delay between iterations, in minutes
+address=${5:-"localhost:6565"} # the domain:PORT address to the API server https://grafana.com/docs/k6/latest/using-k6/k6-options/reference/#address
 
 counter=1
 sleepDuration=$((delay * 60))

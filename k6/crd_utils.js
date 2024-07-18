@@ -59,10 +59,6 @@ export function trackDataMetricsPerURL(res, tags, headerDataRecv, epDataRecv) {
   }
 }
 
-// export function trackMetricsForTags(res, tags, metric) {
-//   metric.add()
-// }
-
 export function getCRD(baseUrl, cookies, id) {
   let res = http.get(`${baseUrl}/${baseCRDPath}/${id}`, { cookies: cookies, tag: crdTag })
   let criteria = []
@@ -190,7 +186,6 @@ export function verifySchemaExistsPolling(baseUrl, cookies, existingID, expected
     res = retryUntilExpected(200, () => { return getSchema(baseUrl, cookies, existingID) })
     timeSpent = new Date() - timeWas
     console.log("SCHEMA STATUS: ", res.status)
-    // console.log("GOT SCHEMA RESPONSE: ", res)
     if (res.status === 200) {
       currentVersion = JSON.parse(res.body).attributes.version
       if (currentVersion === expectedVersion) {
@@ -199,12 +194,6 @@ export function verifySchemaExistsPolling(baseUrl, cookies, existingID, expected
       }
     }
   }
-
-  // let res = getSchema(baseUrl, cookies, existingID)
-  // let currentVersion = JSON.parse(res.body).attributes.version
-  // console.log("SCHEMA:\n", JSON.stringify(JSON.parse(res.body), null, 2))
-  // console.log("VERIFY STATUS: ", res.status)
-  // console.log(`VERIFY VERSION MATCHES (${currentVersion} === ${expectedVersion}): `, currentVersion === expectedVersion)
   const criteria = {}
   criteria[`GET /v1/schemas/<schemaID> returns status 200`] = (r) => r.status === 200
   criteria[`detected the expected schema version "${expectedVersion}" matches the received version`] = (r) => currentVersion === expectedVersion
@@ -220,7 +209,6 @@ export function getSchemaDefinition(baseUrl, cookies, existingID) {
       tags: schemaDefinitionTag,
     }
   )
-  // console.log(`GET schemaDefinition return ${res.status}`)
   return res
 }
 
@@ -239,24 +227,15 @@ export function verifySchemaDefinitionExistsPolling(baseUrl, cookies, existingID
     res = retryUntilExpected(200, () => { return getSchemaDefinition(baseUrl, cookies, existingID) })
     timeSpent = new Date() - timeWas
     console.log("SCHEMADEFINITION STATUS: ", res.status)
-    // console.log("GOT SCHEMA DEF RESPONSE: ", JSON.stringify(res.body, null, 2))
     if (res.status === 200) {
       definitionType = JSON.parse(res.body).definitionType
       if (definitionType.includes(expectedVersion)) {
-        // console.log("GOT SCHEMA DEF: ", res)
         console.log("Polling conditions met after ", timeSpent, "ms");
         break;
       }
     }
   }
-  // let { res, timeSpent } = pollTimeoutUntilExpected(200, timeoutMs, () => getSchemaDefinition(baseUrl, cookies, existingID))
   console.log("FINISHED POLLING AFTER", new Date() - timeWas)
-
-  // console.log("SCHEMADEFINITION:\n", JSON.stringify(JSON.parse(res.body), null, 2))
-  // console.log("VERIFY STATUS: ", res.status)
-  // if (res.status === 200) {
-  //   definitionType = JSON.parse(res.body).definitionType
-  // }
   console.log(`VERIFY DEFINITIONTYPE (${definitionType} includes ${expectedVersion}): `, definitionType.includes(expectedVersion))
   check(res, criteria)
   return { res: res, timeSpent: timeSpent }
@@ -276,9 +255,6 @@ export function updateCRD(baseUrl, cookies, crd) {
       tags: putCRDTag,
     }
   )
-  // console.log("REQUEST BODY:\n", body)
-  // console.log("UPDATE STATUS: ", res.status)
-  // console.log("RESPONSE VERSIONS:\n", JSON.stringify(JSON.parse(res.body).versions, null, 2))
   check(res, {
     'PUT /v1/apiextensions.k8s.io.customresourcedefinitions returns status 200': (r) => r.status === 200,
   })

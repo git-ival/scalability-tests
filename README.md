@@ -84,7 +84,7 @@ pkill -f 'ssh .*-o IgnoreUnknown=TofuCreatedThisTunnel.*'
 If an Azure VM is not accessible via SSH, try the following:
 - add the `boot_diagnostics = true` option in `inputs.tf`
 - apply or re-deploy
-- in the Azure Portal, click on Home -> Virtual Machines -> <name> -> Help -> Reset Password 
+- in the Azure Portal, click on Home -> Virtual Machines -> <name> -> Help -> Reset Password
 - then Home -> Virtual Machines -> <name> -> Help -> Serial Console
 
 That should give you access to the VM's console, where you can log in with the new password and troubleshoot.
@@ -131,4 +131,15 @@ export TOFU_VAR_FILE=tofu/examples/ssh.tfvars.json
 ./bin/teardown.mjs
 ```
 
-Example files can be found in [tofu/examples].
+Example files can be found in [tofu/examples](./tofu/examples/).
+
+## Local Testing with K6
+The test scripts located in [k6/](./k6/) can be run within the tester cluster created via `dartboard`, or locally using your local `k6` binary.
+To ease local testing with `k6`, two utility files have been added to the [k6/](./k6/) directory.
+- A `.env` file which can be sourced directly before running k6 manually
+- A `k6_with_env.sh` bash script, which can take up to 5 inputs
+  - See the relevant comments in the script for details on each, and their default values
+  - Can be run with:
+  ```shell
+  ./k6_with_env.sh <path to .env> < path to k6 .js script> <number of iterations> <delay X minutes between iterations> <k6 API server address>
+  ```

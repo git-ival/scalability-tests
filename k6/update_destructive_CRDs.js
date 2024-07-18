@@ -21,13 +21,6 @@ export const headerDataRecv = new Trend('header_data_recv');
 export const timePolled = new Trend('time_polled', true);
 
 export const options = {
-  // insecureSkipTLSVerify: true,
-  // tlsAuth: [
-  //   {
-  //     cert: kubeconfig["cert"],
-  //     key: kubeconfig["key"],
-  //   },
-  // ],
   scenarios: {
     delete: {
       executor: 'shared-iterations',
@@ -90,7 +83,6 @@ function cleanup(cookies) {
     let delRes = crdUtil.deleteCRD(baseUrl, cookies, r["id"])
     if (delRes.status !== 200 && delRes.status !== 204) deleteAllFailed = true
     sleep(0.15)
-    // console.log("Delete status: ", delRes.status)
   })
   return deleteAllFailed
 }
@@ -138,7 +130,6 @@ export function checkAndBuildCRDArray(cookies, crdArray) {
   }
   if (crdArray.length != crdCount) fail("Failed to create expected # of CRDs ", crdCount)
   console.log("Expected number of CRDs accounted for ", crdArray.length)
-  // sleep(300)
   return crdArray
 }
 
@@ -180,8 +171,6 @@ export function updateCRDs(data) {
   })
   let storageUpdatedIDs = updateStorageVersion(data, updatedIDs)
   destructiveUpdate(data, storageUpdatedIDs)
-  // Give time for resource usage to cool down between iterations
-  // sleep(900)
 }
 
 function updateStorageVersion(data, updatedIDs) {
@@ -247,8 +236,6 @@ function destructiveUpdate(data, updatedIDs) {
     return filteredVersions.length === 1 && r.spec.versions.indexOf(filteredVersions[0]) === 1
   })
   console.log("NUM CRDS AFTER FILTER: ", filteredData.length)
-  // console.log("STORAGE INDEX: ", resData.filter(r => r["metadata"]["name"].startsWith(namePrefix))
-  //   .filter(r => r.spec.versions.indexOf(r.spec.versions.filter(v => v.storage == true)[0])))
   let numUpdated = filteredData.length
   check((numUpdated / crdCount), {
     'Total % of CRDs reflecting the previous updated storage version >= 99%': (v) => v >= 0.99,

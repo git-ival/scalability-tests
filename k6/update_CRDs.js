@@ -134,7 +134,6 @@ export function checkAndBuildCRDArray(cookies, crdArray) {
 
 export function updateCRDs(data) {
   let crds = data.crdArray
-  // console.log("data.crdArray", data.crdArray)
   crds.forEach(c => {
     console.log("VERSIONS LENGTH: ", c.spec.versions.length)
     if (c.spec.versions.length != 2) {
@@ -162,6 +161,4 @@ export function updateCRDs(data) {
   check((numUpdated / crdCount), {
     'Total % of CRDs reflecting the newly added version >= 99%': (v) => v >= 0.99,
   })
-  // Give time for resource usage to cool down between iterations
-  // sleep(900)
 }
