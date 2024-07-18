@@ -78,7 +78,6 @@ function cleanup(cookies) {
   crdArray.forEach(r => {
     let delRes = crdUtil.deleteCRD(baseUrl, cookies, r["id"]);
     if (delRes.status !== 200 && delRes.status !== 204) deleteAllFailed = true;
-    // console.log("Delete status: ", delRes.status)
     sleep(0.5);
   })
   return deleteAllFailed;
@@ -129,7 +128,6 @@ export function checkAndBuildCRDArray(cookies, crdArray) {
     attempts += 1;
   }
   if (crdArray.length != crdCount) fail(`Failed to create expected # of CRDs (${crdCount}), got (${crdArray.length})`);
-  // console.log("Expected number of CRDs accounted for ", crdArray.length);
   sleep(300);
   return crdArray;
 }
@@ -139,7 +137,6 @@ export function loadCRDs(data) {
   while (new Date() - timeWas < crdUtil.backgroundRefreshMs) {
     let crds = data.crdArray;
     crds.forEach(c => {
-      // console.log("VERSIONS LENGTH: ", c.spec.versions.length);
       if (c.spec.versions.length != 2) {
         fail("CRD DOES NOT HAVE EXPECTED # OF VERSIONS (2)");
       }
@@ -149,19 +146,15 @@ export function loadCRDs(data) {
 
       modifyCRD.spec.versions[1].storage = false;
       modifyCRD.spec.versions[2] = newSchema;
-      // console.log("MODIFIED VERSIONS LENGTH: ", modifyCRD.spec.versions.length);
       if (modifyCRD.spec.versions.length != 3) {
         fail("CRD DOES NOT HAVE EXPECTED # OF VERSIONS (3)");
       }
-      // console.log("MODIFIED CRD: ", JSON.stringify(modifyCRD, null, 2));
       res = crdUtil.updateCRD(baseUrl, data.cookies, modifyCRD);
       crdUtil.trackDataMetricsPerURL(res, crdUtil.putCRDTag, headerDataRecv, epDataRecv);
-      // sleep(0.25);
     })
     let { res, timeSpent } = crdUtil.verifyCRDs(baseUrl, data.cookies, namePrefix, crdCount, crdUtil.crdRefreshDelayMs * 5);
     console.log("VERIFY STATUS: ", res.status);
     timePolled.add(timeSpent, crdUtil.crdsTag);
-    // sleep(0.15);
     let numUpdated = JSON.parse(res.body)["data"].filter(r => r["metadata"]["name"].startsWith(namePrefix)).filter(r => r.spec.versions.length == 3).length;
     check((numUpdated / crdCount), {
       'Total % of CRDs reflecting the newly added version >= 99%': (v) => v >= 0.99,

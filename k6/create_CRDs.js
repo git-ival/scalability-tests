@@ -48,7 +48,6 @@ function cleanup(cookies, namePrefix) {
     let delRes = crdUtil.deleteCRD(baseUrl, cookies, r["id"])
     if (delRes.status !== 200 && delRes.status !== 204) deleteAllFailed = true
     sleep(0.5)
-    // console.log("Delete status: ", delRes.status)
   })
   return deleteAllFailed
 }
@@ -64,20 +63,12 @@ export function setup() {
   // delete leftovers, if any
   let deleteAllFailed = cleanup(cookies, namePrefix)
   if (deleteAllFailed) fail("Failed to delete all existing crontab CRDs during setup!")
-  // Wait for resource usage to reduce for more easily identifiable load impact
-  // sleep(300)
   // return data that remains constant throughout the test
   return cookies
 }
 
 export function createCRDs(cookies) {
-  // const namePattern = `${metaVU.idInTest}-${metaVU.iterationInInstance}`
-  // console.log("namePrefix: ", namePattern)
-  // let res = crdUtil.createCRD(baseUrl, cookies, namePattern)
-  // crdUtil.trackDataMetricsPerURL(res, crdUtil.crdsTag, headerDataRecv, epDataRecv)
-  // sleep(0.25)
   for (let i = 0; i < crdCount; i++) {
-    // let crdSuffix = `manual-${i}`
     let crdSuffix = `${exec.vu.idInTest}-${randomString(4)}`
     let res = crdUtil.createCRD(baseUrl, cookies, crdSuffix)
     crdUtil.trackDataMetricsPerURL(res, crdUtil.crdsTag, headerDataRecv, epDataRecv)
@@ -92,10 +83,3 @@ export function createCRDs(cookies) {
   // Give time for resource usage to cool down between iterations
   sleep(900)
 }
-
-// export function teardown(cookies) {
-// let { _, timeSpent } = crdUtil.verifyCRDs(baseUrl, cookies, namePrefix, 500, crdUtil.crdRefreshDelayMs * 5)
-// timePolled.add(timeSpent, crdUtil.crdsTag)
-// sleep(15)
-// cleanup(cookies, namePrefix)
-// }

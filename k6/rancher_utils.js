@@ -461,7 +461,6 @@ export function pollTimeoutUntilExpected(expected, timeoutMs, f) {
       console.log("Got 200 status after ", timeSpent, "ms");
       break;
     }
-    // sleep(Math.random())
   }
   return { res: res, timeSpent: timeSpent }
 }

@@ -9,7 +9,7 @@ import * as k8s from './k8s.js'
 const configMapCount = __ENV.CONFIG_MAP_COUNT
 const vus = __ENV.K6_VUS || 20
 const rate = 5
-const configMapData = open('./964KB.txt')
+const configMapData = Array.from([964000], () => Math.floor(Math.random() * 10)).join('');
 const nameScheme = __ENV.NAME_SCHEME
 const namespace = "vai-test"
 
@@ -91,7 +91,6 @@ export function setup() {
 }
 
 export function createConfigMaps(cookies) {
-  // const i = exec.scenario.iterationInTest
   const namePrefix = `${nameScheme}` || `test-config-map-${exec.scenario.name}`
   const name = `${namePrefix}-${exec.scenario.iterationInTest}`.toLowerCase()
   const body = {
@@ -115,18 +114,3 @@ export function createConfigMaps(cookies) {
   })
   sleep(1.0 / rate)
 }
-
-// function teardown(cookies) {
-//   response = http.del(
-//     `${baseUrl}/v1/configmaps/default/${name}`,
-//     null,
-//     {
-//       headers: {
-//         accept: 'application/json',
-//         referer:
-//           `${baseUrl}/dashboard/c/local/explorer/configmap?q=${name}`,
-//       },
-//       cookies: cookies,
-//     }
-//   )
-// }

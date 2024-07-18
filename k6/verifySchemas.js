@@ -80,7 +80,6 @@ function cleanup(cookies) {
   crdArray.forEach(r => {
     let delRes = crdUtil.deleteCRD(baseUrl, cookies, r["id"])
     if (delRes.status !== 200 && delRes.status !== 204) deleteAllFailed = true
-    // console.log("Delete status: ", delRes.status)
     sleep(0.5)
   })
   return deleteAllFailed
@@ -104,7 +103,6 @@ export function setup() {
 export function generateCRDArray(cookies) {
   for (let i = 0; i < crdCount; i++) {
     let crdSuffix = `${i}`
-    // let crdSuffix = `${exec.vu.idInTest}-${randomString(4)}`
     let res = crdUtil.createCRD(baseUrl, cookies, crdSuffix)
     crdUtil.trackDataMetricsPerURL(res, crdUtil.crdsTag, headerDataRecv, epDataRecv)
   }
@@ -116,7 +114,6 @@ export function generateCRDArray(cookies) {
   }
   let finalCRD = crdArray[crdArray.length - 1]
   let schemaID = finalCRD.spec.group + "." + finalCRD.spec.names.singular
-  // sleep(crdUtil.crdRefreshDelaySeconds + 1)
   let { res, timeSpent } = crdUtil.verifySchemaExistsPolling(baseUrl, cookies, schemaID, finalCRD.spec.versions[1].name, crdUtil.crdRefreshDelayMs * 5)
   crdUtil.trackDataMetricsPerURL(res, crdUtil.schemasTag, headerDataRecv, epDataRecv)
   console.log("TIME SPENT: ", timeSpent)
@@ -127,7 +124,6 @@ export function generateCRDArray(cookies) {
 
   crdArray.forEach((crd, i) => {
     schemaID = crd.spec.group + "." + crd.spec.names.singular
-    // sleep(crdUtil.crdRefreshDelaySeconds + 1)
     let { res, timeSpent } = crdUtil.verifySchemaExistsPolling(baseUrl, cookies, schemaID, crd.spec.versions[1].name, crdUtil.crdRefreshDelayMs * 5)
     crdUtil.trackDataMetricsPerURL(res, crdUtil.schemasTag, headerDataRecv, epDataRecv)
     console.log("TIME SPENT: ", timeSpent)
@@ -145,12 +141,9 @@ export function verifySchemas(data) {
   let CRDs = data.crdArray
   let res = null;
 
-  // verify modified schemas after 3 seconds (default refresh time is 2 seconds)
-  // setTimeout(verifySchema, 3000, data.cookies, )
   // add extra schema to crds
   let updated = 0
   CRDs.forEach((crd, i) => {
-    // console.log("CRD NAME: ", crd.metadata.name)
     console.log("VERSIONS LENGTH: ", crd.spec.versions.length)
     if (crd.spec.versions.length != 2) {
       fail("CRD DOES NOT HAVE EXPECTED # OF VERSIONS (2)")
@@ -159,11 +152,9 @@ export function verifySchemas(data) {
     let modifyCRD = JSON.parse(res.body)
     crdUtil.trackDataMetricsPerURL(res, crdUtil.crdTag, headerDataRecv, epDataRecv)
 
-    // modifyCRD.spec.versions.push(newSchema)
     modifyCRD.spec.versions[2] = newSchema
     // Unset previously stored version
     modifyCRD.spec.versions[1].storage = false
-    // console.log("MODIFIED VERSIONS: ", JSON.stringify(modifyCRD.spec.versions, null, 2))
     console.log("MODIFIED VERSIONS LENGTH: ", modifyCRD.spec.versions.length)
     if (modifyCRD.spec.versions.length != 3) {
       fail("CRD DOES NOT HAVE EXPECTED # OF VERSIONS (3)")
@@ -175,9 +166,7 @@ export function verifySchemas(data) {
     crdUtil.trackDataMetricsPerURL(res, crdUtil.putCRDTag, headerDataRecv, epDataRecv)
     updated += 1
   })
-  // console.log("UPDATED CRDS: ", updated)
 
-  // console.log("UPDATED CRD IDs:\n", existingIDs)
   existingIDs.forEach(id => {
     let { res, timeSpent } = crdUtil.verifySchemaExistsPolling(baseUrl, data.cookies, id, newSchema.name, crdUtil.crdRefreshDelayMs)
     let schemaBytes = res.body.length
@@ -188,36 +177,27 @@ export function verifySchemas(data) {
   let reverted = 0
   // remove extra schema from crds
 
-  // console.log("\n",CRDs[0].spec.versions.length, "\n")
   CRDs.forEach((crd, i) => {
     // get latest version of each CRD
     let res = crdUtil.getCRD(baseUrl, data.cookies, crd.id)
     let updatedCRD = JSON.parse(res.body)
     crdUtil.trackDataMetricsPerURL(res, crdUtil.crdTag, headerDataRecv, epDataRecv)
-    // console.log("UPDATED CRD:\n", updateCRD)
     // swap out active versions
     updatedCRD.spec.versions[2].storage = false
     updatedCRD.spec.versions[2].served = false
     updatedCRD.spec.versions[1].storage = true
-    // delete crd.spec.versions[2]
 
-    // console.log(JSON.stringify(crd.spec, null, 2))
-    // console.log("UPDATED CRD VERSIONS:\n", updatedCRD.spec.versions)
     res = crdUtil.updateCRD(baseUrl, data.cookies, updatedCRD)
     crdUtil.trackDataMetricsPerURL(res, crdUtil.putCRDTag, headerDataRecv, epDataRecv)
     sleep(crdUtil.crdRefreshDelaySeconds + 1)
     res = crdUtil.getCRD(baseUrl, data.cookies, crd.id)
     updatedCRD = JSON.parse(res.body)
     crdUtil.trackDataMetricsPerURL(res, crdUtil.crdTag, headerDataRecv, epDataRecv)
-    // updatedCRD.spec.versions.splice(2, 1)
     updatedCRD.status.storedVersions.splice(1, 1)
-    // console.log("UPDATED CRD VERSIONS:\n", updatedCRD.spec.versions)
     res = crdUtil.updateCRD(baseUrl, data.cookies, updatedCRD)
     crdUtil.trackDataMetricsPerURL(res, crdUtil.putCRDTag, headerDataRecv, epDataRecv)
     reverted += 1
   })
-  // console.log("REVERTED CRDS: ", reverted)
-  // console.log(CRDs[0])
 
   existingIDs.forEach(id => {
     let { res, timeSpent } = crdUtil.verifySchemaExistsPolling(baseUrl, data.cookies, id, CRDs[0].spec.versions[1].name, crdUtil.crdRefreshDelayMs)
