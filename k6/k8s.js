@@ -29,8 +29,8 @@ export function kubeconfig(file, contextName) {
 }
 
 // creates a k8s resource
-export function create(url, body) {
-  const res = http.post(url, JSON.stringify(body));
+export function create(url, body, params = null) {
+  const res = http.post(url, JSON.stringify(body), params);
 
   check(res, {
     'POST returns status 201 or 409': (r) => r.status === 201 || r.status === 409,
@@ -40,7 +40,7 @@ export function create(url, body) {
     // wait a bit and try again
     sleep(Math.random())
 
-    return create(url, body)
+    return create(url, body, params)
   }
 
   return res
@@ -60,7 +60,7 @@ export function del(url) {
 const continueRegex = /"continue":"([A-Za-z0-9]+)"/;
 
 // lists k8s resources
-export function list(url) {
+export function list(url, params = null) {
   let _continue = 'first'
   let responses = []
 
@@ -73,7 +73,7 @@ export function list(url) {
       fullUrl.searchParams.append('continue', _continue);
     }
 
-    const res = http.get(fullUrl.toString());
+    const res = http.get(fullUrl.toString(), params);
 
     check(res, {
       'list returns status 200': (r) => r.status === 200,
@@ -89,7 +89,7 @@ export function list(url) {
 }
 
 // patches k8s resources and valid subresources
-export function patch(url, body, params) {
+export function patch(url, body, params = null) {
   // patch requires these headers to be set to appropriate values, below are the defaults
   let defaultParams = { headers: { "Content-Type": "application/merge-patch+json", "Accept": "application/json" } }
   if (!params.hasOwnProperty("headers")) _.merge(params, defaultParams)
