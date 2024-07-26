@@ -18,11 +18,11 @@ import {k6_run} from "./lib/k6.mjs";
 import {install_rancher_monitoring} from "./lib/rancher_monitoring.mjs";
 
 // Parameters
-const RANCHER_VERSION = "2.8.3"
-const RANCHER_CHART = `https://charts.rancher.com/server-charts/prime/rancher-${RANCHER_VERSION}.tgz`
+const RANCHER_VERSION = "2.9.0-alpha7"
+const RANCHER_CHART = `https://releases.rancher.com/server-charts/alpha/rancher-${RANCHER_VERSION}.tgz`
 const RANCHER_IMAGE_TAG = `v${RANCHER_VERSION}`
-const CERT_MANAGER_CHART = "https://charts.jetstack.io/charts/cert-manager-v1.8.0.tgz"
-const GRAFANA_CHART = "https://github.com/grafana/helm-charts/releases/download/grafana-6.56.5/grafana-6.56.5.tgz"
+const CERT_MANAGER_CHART = "https://charts.jetstack.io/charts/cert-manager-v1.11.1.tgz"
+const GRAFANA_CHART = "https://github.com/grafana/helm-charts/releases/download/grafana-7.3.12/grafana-7.3.12.tgz"
 
 // Step 1: OpenTofu
 run(`tofu -chdir=${q(terraformDir())} init -upgrade`)

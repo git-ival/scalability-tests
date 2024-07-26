@@ -9,7 +9,7 @@ const baseUrl = __ENV.BASE_URL
 const username = __ENV.USERNAME
 const password = __ENV.PASSWORD
 const token = __ENV.TOKEN
-const crdCount = __ENV.CRD_COUNT || 1
+const crdCount = __ENV.CRD_COUNT || 500
 const namePrefix = "crontabs-test-"
 
 export const epDataRecv = new Trend('endpoint_data_recv');
@@ -103,7 +103,7 @@ export function setup() {
   // return data that remains constant throughout the test
   // return { cookies: cookies, crdArray: checkAndBuildCRDArray(cookies, crdArray) }
   // return data that remains constant throughout the test
-  return { cookies: cookies, crdArray: generateCRDArray(cookies) }
+  return { cookies: cookies, crdArray: checkAndBuildCRDArray(cookies, crdArray) }
 }
 
 
@@ -127,7 +127,7 @@ export function checkAndBuildCRDArray(cookies, crdArray) {
       crdUtil.trackDataMetricsPerURL(res, crdUtil.crdsTag, headerDataRecv, epDataRecv)
       sleep(0.25)
     }
-    let { res: res, crdArray: crds } = crdUtil.getCRDsMatchingName(baseUrl, cookies, namePrefix)
+    let { res, crdArray: crds } = crdUtil.getCRDsMatchingName(baseUrl, cookies, namePrefix)
     if (Array.isArray(crds) && crds.length) crdArray = crds
     if (res.status != 200 && attempts == (retries - 1)) fail("Failed to retrieve expected CRDs during setup")
     attempts += 1

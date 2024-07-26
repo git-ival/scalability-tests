@@ -3,19 +3,19 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "4.31.0"
+      version = "5.59.0"
     }
     tls = {
       source  = "hashicorp/tls"
-      version = "4.0.3"
+      version = "4.0.5"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "2.7.1"
+      version = "2.14.0"
     }
     ssh = {
       source  = "loafoe/ssh"
-      version = "2.2.1"
+      version = "2.7.0"
     }
   }
 }
@@ -28,17 +28,19 @@ locals {
 
 provider "aws" {
   region = local.region
+  profile =  length(local.aws_profile) > 0 ? local.aws_profile : null
 }
 
 module "network" {
   source               = "../../modules/aws_network"
   project_name         = local.project_name
   region               = local.region
+  bastion_host_ami     = length(local.arm_64_ami) > 0 ? local.arm_64_ami : var.arm_64_ami
+  ssh_user             = local.ssh_user
   availability_zone    = local.availability_zone
   ssh_public_key_path  = var.ssh_public_key_path
   ssh_private_key_path = var.ssh_private_key_path
 }
-
 
 module "k3s_cluster" {
   count        = length(local.k3s_clusters)
@@ -64,7 +66,9 @@ module "k3s_cluster" {
   availability_zone         = local.availability_zone
   ssh_key_name              = module.network.key_name
   ssh_private_key_path      = var.ssh_private_key_path
+  ssh_user                  = local.ssh_user
   ssh_bastion_host          = module.network.bastion_public_name
+  ssh_bastion_user          = local.ssh_bastion_user
   subnet_id                 = local.k3s_clusters[count.index].public_ip ? module.network.public_subnet_id : module.network.private_subnet_id
   vpc_security_group_id     = local.k3s_clusters[count.index].public_ip ? module.network.public_security_group_id : module.network.private_security_group_id
 }
@@ -93,7 +97,9 @@ module "rke_cluster" {
   availability_zone         = local.availability_zone
   ssh_key_name              = module.network.key_name
   ssh_private_key_path      = var.ssh_private_key_path
+  ssh_user                  = local.ssh_user
   ssh_bastion_host          = module.network.bastion_public_name
+  ssh_bastion_user          = local.ssh_bastion_user
   subnet_id                 = local.rke_clusters[count.index].public_ip ? module.network.public_subnet_id : module.network.private_subnet_id
   vpc_security_group_id     = local.rke_clusters[count.index].public_ip ? module.network.public_security_group_id : module.network.private_security_group_id
 }
@@ -122,7 +128,9 @@ module "rke2_cluster" {
   availability_zone         = local.availability_zone
   ssh_key_name              = module.network.key_name
   ssh_private_key_path      = var.ssh_private_key_path
+  ssh_user                  = local.ssh_user
   ssh_bastion_host          = module.network.bastion_public_name
+  ssh_bastion_user          = local.ssh_bastion_user
   subnet_id                 = local.rke2_clusters[count.index].public_ip ? module.network.public_subnet_id : module.network.private_subnet_id
   vpc_security_group_id     = local.rke2_clusters[count.index].public_ip ? module.network.public_security_group_id : module.network.private_security_group_id
 }

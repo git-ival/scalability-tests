@@ -1,6 +1,5 @@
 import { check, fail, sleep } from 'k6'
 import http from 'k6/http'
-import { setTimeout, setInterval, clearTimeout, clearInterval } from 'k6/timers'
 
 export function pollUntil(f, delay, timeoutMs) {
   const timeWas = new Date();
