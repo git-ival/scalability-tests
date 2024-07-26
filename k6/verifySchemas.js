@@ -98,7 +98,38 @@ export function setup() {
   if (deleteAllFailed) fail("Failed to delete all existing crontab CRDs during setup!")
   let { _, crdArray } = crdUtil.getCRDsMatchingName(baseUrl, cookies, namePrefix)
 
-  return { cookies: cookies, crdArray: generateCRDArray(cookies) }
+  return { cookies: cookies, crdArray: checkAndBuildCRDArray(cookies, crdArray) }
+}
+
+export function checkAndBuildCRDArray(cookies, crdArray) {
+  let retries = 3
+  let attempts = 0
+  while (crdArray.length != crdCount && attempts < retries) {
+    console.log("Creating needed CRDs")
+    // delete leftovers, if any so that we create exactly crdCount
+    if (crdArray.length == crdCount) {
+      console.log("Finished setting up expected CRD count")
+      break;
+    }
+    if (crdArray.length > 0) {
+      let deleteAllFailed = cleanup(cookies,)
+      if (deleteAllFailed && attempts == (retries - 1)) fail("Failed to delete all existing crontab CRDs during setup!")
+    }
+    for (let i = 0; i < crdCount; i++) {
+      let crdSuffix = `${i}`
+      let res = crdUtil.createCRD(baseUrl, cookies, crdSuffix)
+      crdUtil.trackDataMetricsPerURL(res, crdUtil.crdsTag, headerDataRecv, epDataRecv)
+      sleep(0.25)
+    }
+    let { res, crdArray: crds } = crdUtil.getCRDsMatchingName(baseUrl, cookies, namePrefix)
+    if (Array.isArray(crds) && crds.length) crdArray = crds
+    if (res.status != 200 && attempts == (retries - 1)) fail("Failed to retrieve expected CRDs during setup")
+    attempts += 1
+  }
+  if (crdArray.length != crdCount) fail("Failed to create expected # of CRDs")
+  console.log("Expected number of CRDs accounted for ", crdArray.length)
+  sleep(300)
+  return crdArray
 }
 
 export function generateCRDArray(cookies) {

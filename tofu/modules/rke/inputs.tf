@@ -47,9 +47,22 @@ variable "ssh_private_key_path" {
   type        = string
 }
 
+variable "ssh_user" {
+  description = "User name to use for the host SSH connection"
+  type        = string
+  default     = "root"
+}
+
 variable "ssh_bastion_host" {
   description = "Public name of the SSH bastion host. Leave null for publicly accessible instances"
+  type        = string
   default     = null
+}
+
+variable "ssh_bastion_user" {
+  description = "User name for the SSH connection to the bastion"
+  type        = string
+  default     = "root"
 }
 
 variable "local_kubernetes_api_port" {
@@ -66,3 +79,9 @@ variable "node_cidr_mask_size" {
   description = "Size of the CIDR mask for nodes. Increase when increasing max_pods so that 2^(32-node_cidr_max_size) > 2 * max_pods"
   default     = 24
 }
+
+variable "install_docker_version" {
+  description = "Docker version to install if docker is not already installed on the node"
+  default     = "24.0.9"
+}
+

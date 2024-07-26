@@ -6,23 +6,33 @@ terraform {
   }
 }
 
+resource "null_resource" "install_docker" {
+  provisioner "local-exec" {
+    interpreter = ["bash", "-c"]
+    command     = "curl https://releases.rancher.com/install-docker/${var.install_docker_version}.sh -o ${path.root}/config/install-docker${var.install_docker_version}.sh"
+  }
+}
+
 resource "ssh_resource" "node_preparation" {
   count        = length(var.server_names) + length(var.agent_names)
   host         = concat(var.server_names, var.agent_names)[count.index]
   private_key  = file(var.ssh_private_key_path)
-  user         = "root"
+  user         = var.ssh_user
   bastion_host = var.ssh_bastion_host
+  bastion_user = var.ssh_bastion_user
   timeout      = "600s"
 
   file {
-    content     = file("${path.module}/prepare_for_rke.sh")
-    destination = "/root/prepare_for_rke.sh"
+    source      = "${path.root}/config/install-docker${var.install_docker_version}.sh"
+    destination = "/tmp/install-docker${var.install_docker_version}.sh"
     permissions = "0700"
   }
 
   commands = [
-    "/root/prepare_for_rke.sh > >(tee prepare_for_rke.log) 2> >(tee prepare_for_rke.err >&2)",
+    "command -v docker > /dev/null 2>&1 || sudo /tmp/install-docker${var.install_docker_version}.sh > >(tee install-docker${var.install_docker_version}.log) 2> >(tee install-docker${var.install_docker_version}.err >&2)",
+    "sudo usermod -aG docker ${var.ssh_user}"
   ]
+  depends_on = [null_resource.install_docker]
 }
 
 resource "local_file" "rke_config" {
@@ -30,7 +40,9 @@ resource "local_file" "rke_config" {
     server_names         = var.server_names
     agent_names          = var.agent_names
     ssh_private_key_path = var.ssh_private_key_path
+    ssh_user             = var.ssh_user
     ssh_bastion_host     = var.ssh_bastion_host
+    ssh_bastion_user     = var.ssh_bastion_user
     kubernetes_version   = split(" ", var.distro_version)[1]
     max_pods             = var.max_pods
     node_cidr_mask_size  = var.node_cidr_mask_size

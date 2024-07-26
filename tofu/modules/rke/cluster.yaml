@@ -2,23 +2,23 @@
 ssh_key_path: ${jsonencode(ssh_private_key_path)}
 bastion_host:
   address: ${jsonencode(ssh_bastion_host)}
-  user: root
+  user: ${jsonencode(ssh_bastion_user)}
 
 # Node definitions
 nodes:
 %{ for server_name in server_names ~}
-- address: ${jsonencode(server_name)}
-  user: root
-  role:
-    - controlplane
-    - etcd
-    - worker
+  - address: ${jsonencode(server_name)}
+    user: ${jsonencode(ssh_user)}
+    role:
+      - controlplane
+      - etcd
+      - worker
 %{ endfor ~}
 %{ for i, agent_name in agent_names ~}
-- address: ${jsonencode(agent_name)}
-  user: root
-  role:
-    - worker
+  - address: ${jsonencode(agent_name)}
+    user: ${jsonencode(ssh_user)}
+    role:
+      - worker
 %{ if length(agent_labels) > i && length(agent_labels[i]) > 0 ~}
   labels:
 %{ for label in agent_labels[i] ~}

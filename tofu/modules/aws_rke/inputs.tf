@@ -55,10 +55,21 @@ variable "ssh_private_key_path" {
   type        = string
 }
 
+variable "ssh_user" {
+  description = "User name to use for the SSH connection"
+  type        = string
+  default     = "root"
+}
+
 variable "ssh_bastion_host" {
-  description = "Public name of the SSH bastion host. Leave null for publicly accessible nodes"
+  description = "Public name of the SSH bastion host. Leave null for publicly accessible instances"
   type        = string
   default     = null
+}
+
+variable "ssh_bastion_user" {
+  description = "User name for the SSH bastion host's OS"
+  default     = "root"
 }
 
 variable "subnet_id" {
@@ -94,7 +105,7 @@ variable "sans" {
 
 variable "distro_version" {
   description = "RKE version followed by the Kubernetes version, see https://github.com/rancher/rke/releases"
-  default     = "v1.4.10/rke_darwin-amd64 v1.26.8-rancher1-1"
+  default     = "v1.6.0-rc8/rke_darwin-amd64 v1.29.6-rancher1-1"
 }
 
 variable "max_pods" {
