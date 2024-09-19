@@ -46,6 +46,15 @@ type clusterAddresses struct {
 	Public clusterAddress
 }
 
+type accessDetails struct {
+	URL                string
+	Username           string
+	Password           string
+	Kubeconfig         string
+	Context            string
+	NodeAccessCommands map[string]string
+}
+
 // prepare prepares tofu for execution and parses a dart file from the command line context
 func prepare(cli *cli.Context) (*tofu.Tofu, *dart.Dart, error) {
 	dartPath := cli.String(ArgDart)

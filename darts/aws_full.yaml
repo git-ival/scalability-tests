@@ -7,14 +7,15 @@ tofu_main_directory: /home/ivln/workspace/work/RancherVCS/scalability-tests/tofu
 #tofu_parallelism: 10
 tofu_variables:
   project_name: st
-  region: us-east-1
-  availability_zone: us-east-1a
+  region: us-west-1
+  availability_zone: us-west-1a
   aws_profile: rancher-eng
-  ssh_private_key_path: ~/.ssh/id_ed25519
-  ssh_public_key_path: ~/.ssh/id_ed25519.pub
-  ssh_user: root
-  ssh_bastion_user: root
-  bastion_host_ami: ami-0e55a8b472a265e3f # openSUSE-Leap-15-5-v20230608-hvm-ssd-arm64
+  ssh_private_key_path: /home/ivln/workspace/work/RancherVCS/ival-pc-temp.pem
+  ssh_public_key_path: /home/ivln/workspace/work/RancherVCS/ival-pc-temp.pub
+  ssh_user: ubuntu
+  ssh_bastion_user: ubuntu
+  bastion_host_ami: ami-094571ba1361204cd # openSUSE-Leap-15-5-v20230608-hvm-ssd-arm64
+
 
   upstream_cluster:
     name_prefix: upstream
@@ -26,7 +27,7 @@ tofu_variables:
     # aws-specific
     instance_type: i3.large
     instance_tags: { Owner: st, DoNotDelete: true }
-    ami: ami-009fd8a4732ea789b # openSUSE-Leap-15-5-v20230608-hvm-ssd-x86_64
+    ami: ami-0b03b9afed756bb4b # openSUSE-Leap-15-5-v20230608-hvm-ssd-x86_64
 
   deploy_tester_cluster: true
   tester_cluster:
@@ -39,7 +40,7 @@ tofu_variables:
     # aws-specific
     instance_type: t3a.large
     instance_tags: { Owner: st, DoNotDelete: true }
-    ami: ami-009fd8a4732ea789b # openSUSE-Leap-15-5-v20230608-hvm-ssd-x86_64
+    ami: ami-0b03b9afed756bb4b # openSUSE-Leap-15-5-v20230608-hvm-ssd-x86_64
 
   downstream_cluster_templates:
     - cluster_count: 0 # defaults to 0 to keep in-line with previous behavior
@@ -52,7 +53,7 @@ tofu_variables:
       # aws-specific
       instance_type: t4g.large
       instance_tags: { Owner: st, DoNotDelete: true }
-      ami: ami-0e55a8b472a265e3f # openSUSE-Leap-15-5-v20230608-hvm-ssd-arm64
+      ami: ami-094571ba1361204cd # openSUSE-Leap-15-5-v20230608-hvm-ssd-arm64
   first_kubernetes_api_port: 7445
   first_app_http_port: 9080
   first_app_https_port: 9443
@@ -61,13 +62,13 @@ chart_variables:
   rancher_replicas: 3
   downstream_rancher_monitoring: true
   #  admin_password: adminadminadmin
-  rancher_version: 2.8.6
+  rancher_version: 2.9.0
   #  rancher_image_override: rancher/rancher
   #  rancher_image_tag_override: v2.8.6-debug-1
   #  force_prime_registry: false
   # see https://github.com/rancher/charts/tree/release-v2.8/assets/rancher-monitoring-crd
-  rancher_monitoring_version: 103.1.1+up45.31.1
-#  cert_manager_version: 1.8.0
+  rancher_monitoring_version: 104.1.0+up57.0.3
+  cert_manager_version: 1.12.13
 #  tester_grafana_version: 6.56.5
 
 test_variables:

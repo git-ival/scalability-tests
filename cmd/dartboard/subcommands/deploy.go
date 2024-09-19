@@ -109,7 +109,6 @@ func Deploy(cli *cli.Context) error {
 		return err
 	}
 	if err = importDownstreamClusters(r, rancherImageTag, tf, clusters); err != nil {
-		return err
 	}
 
 	return GetAccess(cli)
@@ -117,9 +116,6 @@ func Deploy(cli *cli.Context) error {
 
 func chartInstall(kubeConf string, chart chart, jsonVals string) error {
 	var vals map[string]interface{} = nil
-	var err error
-
-	name := chart.name
 	namespace := chart.namespace
 	path := chart.path
 	if !strings.HasPrefix(path, "http") {
@@ -134,7 +130,7 @@ func chartInstall(kubeConf string, chart chart, jsonVals string) error {
 		}
 	}
 
-	if err = helm.Install(kubeConf, path, name, namespace, vals); err != nil {
+	if err = helm.Install(kubeConf, path, name, namespace, true, vals); err != nil {
 		return fmt.Errorf("chart %s: %w", name, err)
 	}
 	return nil
@@ -231,6 +227,15 @@ func chartInstallRancherIngress(cluster *tofu.Cluster) error {
 
 	return chartInstall(cluster.Kubeconfig, chartRancherIngress, chartVals)
 }
+
+// func chartInstallRancherMonitoring(r *dart.Dart) {
+//   adminUser := &management.User{
+// 		Username: "admin",
+// 		Password: r.ChartVariables.AdminPassword,
+// 	}
+//   token.GenerateUserToken(adminUser)
+// 	client, err := rancher.NewClient(, nil)
+// }
 
 func chartInstallRancherMonitoring(r *dart.Dart, cluster *tofu.Cluster, noSchedToleration bool) error {
 	rancherMinorVersion := strings.Join(strings.Split(r.ChartVariables.RancherVersion, ".")[0:2], ".")

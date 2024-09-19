@@ -33,7 +33,7 @@ import (
 // Timeout for chart installation. Helm default is 1 minute, but there were timeouts with Rancher Monitoring on AKS
 const timeout = 5 * time.Minute
 
-func Install(kubecfg, chartLocation, releaseName, namespace string, vals map[string]interface{}) error {
+func Install(kubecfg, chartLocation, releaseName, namespace string, wait bool, vals map[string]interface{}) error {
 	settings := cli.New()
 	settings.KubeConfig = kubecfg
 	settings.Debug = true
@@ -62,6 +62,8 @@ func Install(kubecfg, chartLocation, releaseName, namespace string, vals map[str
 			installAction.ReleaseName = releaseName
 			installAction.Namespace = namespace
 			installAction.Timeout = timeout
+			installAction.Wait = wait
+			installAction.WaitForJobs = wait
 			if chartPath, err = installAction.LocateChart(chartLocation, settings); err != nil {
 				return err
 			}
